@@ -17,9 +17,9 @@ private:
   static int32_t NextId() { return next_id_++; };
   static bool Initialize();
 
-  static std::vector<std::unique_ptr<Window>> registry_;
-  static bool initialized_;
-  static std::shared_ptr<WindowManager> window_manager_;
-  static int32_t next_id_;
+  inline static std::vector<std::unique_ptr<Window>> registry_;
+  inline static bool initialized_ = false;
+  inline static std::shared_ptr<WindowManager> window_manager_;
+  inline static int32_t next_id_ = 0;
 };
 }  // namespace ivory

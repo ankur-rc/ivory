@@ -6,11 +6,6 @@
 
 namespace ivory {
 
-std::vector<std::unique_ptr<Window>> WindowManager::registry_;
-bool WindowManager::initialized_ = false;
-int32_t WindowManager::next_id_ = 0;
-std::shared_ptr<WindowManager> WindowManager::window_manager_ = nullptr;
-
 WindowManager* WindowManager::GetSingleton() {
   if (!initialized_) {
     window_manager_.reset(new WindowManager);
