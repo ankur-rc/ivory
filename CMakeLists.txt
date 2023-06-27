@@ -11,9 +11,11 @@ find_package(glfw3 3 REQUIRED)
 find_package(glm REQUIRED)
 
 add_library(ivory SHARED src/window.cpp
-                         src/window_manager.cpp)
+                         src/window_manager.cpp
+                         src/shader_utils.cpp)
 
 target_include_directories(ivory PUBLIC include)
 target_link_libraries(ivory PUBLIC GL GLEW glfw)
+target_compile_options(ivory PRIVATE -DSHADER_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/shaders")
 
 add_subdirectory(apps)
