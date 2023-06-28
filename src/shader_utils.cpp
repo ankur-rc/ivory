@@ -1,5 +1,5 @@
 /**
- * Common utilities to load a shader from disk.
+ * Common utilities to load and manage shaders.
  */
 
 #include "ivory/shader_utils.h"
@@ -8,6 +8,8 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+#include "ivory/assert.h"
 
 namespace ivory {
 
@@ -45,12 +47,10 @@ Shader::Shader(const std::string& name, GLenum shader_type)
   // Compile shader
   glCompileShader(id_);
 
-  if (!LogCompileStatus()) {
-    throw std::runtime_error("Failed to compile shader!");
-  }
+  Assert(logAndReturnCompileStatus(), "Failed to compile shader!");
 }
 
-int Shader::LogCompileStatus() {
+int Shader::logAndReturnCompileStatus() {
   int success;
   char infoLog[512];
   glGetShaderiv(id_, GL_COMPILE_STATUS, &success);
@@ -80,23 +80,24 @@ ShaderProgram::ShaderProgram(const Shader& vertex_shader, const Shader& fragment
   // Link program
   glLinkProgram(id_);
 
-  if (!LogLinkStatus()) {
-    throw std::runtime_error("Failed to link program!");
-  }
+  Assert(logAndReturnLinkStatus(), "Failed to link program!");
 }
 
 void ShaderProgram::activate() {
+  activated_program_id_ = id_;
   glUseProgram(id_);
-  activated_ = true;
 }
 
 ShaderProgram::~ShaderProgram() {
-  if (activated_) {
+  if (ShaderProgram::activated_program_id_ == id_) {
+    ShaderProgram::activated_program_id_ = 0;
     glUseProgram(0);
   }
+
+  glDeleteProgram(id_);
 }
 
-int ShaderProgram::LogLinkStatus() {
+int ShaderProgram::logAndReturnLinkStatus() {
   int success;
   char infoLog[512];
   glGetProgramiv(id_, GL_LINK_STATUS, &success);
@@ -109,6 +110,26 @@ int ShaderProgram::LogLinkStatus() {
   }
 
   return success;
+}
+
+void ShaderProgram::setBool(const std::string& name, bool value) const {
+  Assert(activated_program_id_ == id_, "Current shader program is not active!");
+  glUniform1i(glGetUniformLocation(id_, name.c_str()), (int)value);
+}
+
+void ShaderProgram::setInt(const std::string& name, int value) const {
+  Assert(activated_program_id_ == id_, "Current shader program is not active!");
+  glUniform1i(glGetUniformLocation(id_, name.c_str()), value);
+}
+
+void ShaderProgram::setFloat(const std::string& name, float value) const {
+  Assert(activated_program_id_ == id_, "Current shader program is not active!");
+  glUniform1f(glGetUniformLocation(id_, name.c_str()), value);
+}
+
+void ShaderProgram::setVec4f(const std::string& name, const glm::vec4& value) const {
+  Assert(activated_program_id_ == id_, "Current shader program is not active!");
+  glUniform4f(glGetUniformLocation(id_, name.c_str()), value.x, value.y, value.z, value.w);
 }
 
 }  // namespace ivory

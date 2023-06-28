@@ -7,6 +7,7 @@
 #define SHADER_ROOT ""
 #endif
 
+#include <atomic>
 #include <optional>
 #include <string>
 
@@ -36,7 +37,7 @@ private:
   GLuint id_;
   GLenum type_;
 
-  int LogCompileStatus();
+  int logAndReturnCompileStatus();
 };
 
 /**
@@ -47,14 +48,17 @@ public:
   ShaderProgram(const Shader& vertex_shader, const Shader& fragment_shader);
 
   void activate();
+  void setBool(const std::string& name, bool value) const;
+  void setInt(const std::string& name, int value) const;
+  void setFloat(const std::string& name, float value) const;
 
+  void setVec4f(const std::string& name, const glm::vec4& value) const;
   ~ShaderProgram();
 
 private:
   GLuint id_;
-  bool activated_ = false;
-
-  int LogLinkStatus();
+  int logAndReturnLinkStatus();
+  inline static std::atomic<GLuint> activated_program_id_ = 0;
 };
 
 }  // namespace ivory

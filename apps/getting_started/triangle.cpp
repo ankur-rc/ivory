@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 #include <vector>
 
 #include "ivory/opengl.h"
@@ -6,7 +7,7 @@
 #include "ivory/window_manager.h"
 
 int main() {
-  auto window = ivory::WindowManager::GetSingleton()->CreateWindow(480, 360, "Hello Traingle");
+  auto window = ivory::WindowManager::GetSingleton()->CreateWindow(480, 360, "Hello Triangle");
 
   // Create vertices
   const std::vector<float> vertex_data = {
@@ -15,13 +16,12 @@ int main() {
       0.5,  -0.25, 0.0,  // right
   };
 
-  // Create VBO
+  // Create VAO and VBO
   GLuint vao;
   GLuint vbo;
   {
     // Generate VAO
     glGenVertexArrays(1, &vao);
-
     // Bind the VAO
     glBindVertexArray(vao);
 
@@ -42,15 +42,23 @@ int main() {
   auto fragment_shader = ivory::Shader("basic.fs", GL_FRAGMENT_SHADER);
   auto shader_program = ivory::ShaderProgram(vertex_shader, fragment_shader);
 
-
   // Render
+  glm::vec4 color = {1.F, 0.5F, 0.F, 1.F};
+  float i = 0;
   while (!window->IsClosed()) {
     window->Update([&]() {
+      i += 0.01;
+      color.z = std::sin(i) * std::sin(i);
       shader_program.activate();
+      shader_program.setVec4f("color", color);
       glBindVertexArray(vao);
       glDrawArrays(GL_TRIANGLES, 0, 3);
     });
   }
+
+  // De-allocate
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
 
   return 0;
 }
