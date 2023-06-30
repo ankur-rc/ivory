@@ -5,3 +5,6 @@ target_link_libraries(window ivory pthread)
 
 add_executable(triangle triangle.cpp)
 target_link_libraries(triangle ivory)
+
+add_executable(shader shader.cpp)
+target_link_libraries(shader ivory)

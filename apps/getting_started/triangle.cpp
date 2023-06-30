@@ -38,8 +38,8 @@ int main() {
   }
 
   // Create shaders
-  auto vertex_shader = ivory::Shader("basic.vs", GL_VERTEX_SHADER);
-  auto fragment_shader = ivory::Shader("basic.fs", GL_FRAGMENT_SHADER);
+  auto vertex_shader = ivory::Shader("basic.vert", GL_VERTEX_SHADER);
+  auto fragment_shader = ivory::Shader("basic.frag", GL_FRAGMENT_SHADER);
   auto shader_program = ivory::ShaderProgram(vertex_shader, fragment_shader);
 
   // Render
